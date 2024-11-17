@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  chromium:
+    image: lscr.io/linuxserver/chromium:latest
+    container_name: BrowserGRASS
+    privileged: true
+    environment:
+      - TITLE=DKnodes
+      - DISPLAY=:1
+      - PUID=1000
+      - PGID=1000
+      - CUSTOM_USER=${USERNAME}
+      - PASSWORD=${PASSWORD}
+      - LANGUAGE=en_US.UTF-8
+      - CHROME_CLI=https://app.getgrass.io/register/?referralCode=L4gm7ctYwpegwQr https://app.gradient.network/signup?code=ZPFXFB https://app.nodepay.ai/register?ref=B4r8euTTWB2YqLL https://dataquest.nvg8.io//signup?ref=445875 https://app.blockmesh.xyz/register?invite_code=caab6ade-3c79-46c1-882b-2d1639c502e1 https://node.securitylabs.xyz/?from=extension&type=signin&referralCode=cm3m2my0sd38nta1bnrz87unl https://bless.network/dashboard?ref=YKR4BU https://chromewebstore.google.com/detail/teneo-community-node/emcclcoaglgcpoognfiggmhnhgabppkm https://chromewebstore.google.com/detail/dawn-validator-chrome-ext/fpdkjdnhkakefebpekbdhillbhonfjjp
+    volumes:
+      - ${HOME}/chromium/config:/config
+    ports:
+      - "0.0.0.0:${PORT}:3000"  
+    shm_size: '4gb'
+    restart: unless-stopped
