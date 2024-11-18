@@ -34,7 +34,6 @@ install_dependencies() {
     sudo apt update && sudo apt upgrade -y
     sudo apt install -y git curl docker.io docker-compose bash-coreutils
     echo -e "${GREEN}✅ Все необходимые компоненты установлены.${RESET}"
-    read -p "Нажмите Enter для продолжения..."
 }
 
 # Настройка Docker-логов
@@ -71,7 +70,6 @@ install_browser() {
     echo -e "${GREEN}Запуск Docker Compose для установки браузера...${RESET}"
     docker-compose up -d
     echo -e "${GREEN}✅ Браузер успешно установлен и запущен на порту ${PORT}.${RESET}"
-    read -p "Нажмите Enter для продолжения..."
 }
 
 # Перезапуск браузера
@@ -79,7 +77,6 @@ restart_browser() {
     echo -e "${YELLOW}Перезапуск браузера...${RESET}"
     docker-compose restart
     echo -e "${GREEN}✅ Браузер перезапущен.${RESET}"
-    read -p "Нажмите Enter для продолжения..."
 }
 
 # Остановка браузера
@@ -87,7 +84,6 @@ stop_browser() {
     echo -e "${YELLOW}Остановка браузера...${RESET}"
     docker-compose down
     echo -e "${GREEN}✅ Браузер остановлен.${RESET}"
-    read -p "Нажмите Enter для продолжения..."
 }
 
 # Переход в браузер
