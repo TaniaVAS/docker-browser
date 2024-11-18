@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Color codes and icons
+# Цветовые коды
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -9,135 +9,129 @@ YELLOW='\033[1;33m'
 MAGENTA='\033[0;35m'
 RESET='\033[0m'
 
+# Иконки
 ICON_TELEGRAM="🚀"
 ICON_INSTALL="🛠️"
 ICON_STOP="⏹️"
-ICON_RES="🫡"
-ICON_EXIT="🚪"
+ICON_RES="🔄"
 ICON_BROWSE="🌐"
+ICON_EXIT="🚪"
 
-# Function to display ASCII logo and Telegram link
+# Функция отображения ASCII-логотипа
 display_ascii() {
-    echo -e "    ${RED}   GGGGG   RRRRR   AAAAA   SSSSS   SSSSS   ${RESET}"
-    echo -e "    ${GREEN}  G        R    R  A   A  S       S       ${RESET}"
-    echo -e "    ${BLUE}  G  GG    RRRRR   AAAAA  SSSSS   SSSSS   ${RESET}"
-    echo -e "    ${YELLOW}  G   G    R  R    A   A      S       S    ${RESET}"
-    echo -e "    ${MAGENTA}   GGG     R   R   A   A  SSSSS   SSSSS   ${RESET}"
-    echo -e "    ${MAGENTA}${ICON_TELEGRAM} Подписывайтесь на Telegram: https://t.me/CryptalikBTC${RESET}"
-    echo -e "    ${MAGENTA}📢 Подписывайтесь на YouTube: https://www.youtube.com/@Cryptalik${RESET}"
-    echo -e ""
-    echo -e ""
-    echo -e ""
+    echo -e "    ${GREEN}    ____ ____  _____ ____  _____   ${RESET}"
+    echo -e "    ${BLUE}   / ___|  _ \\| ____|  _ \\| ____|  ${RESET}"
+    echo -e "    ${YELLOW}  | |  _| |_) |  _| | | | |  _|    ${RESET}"
+    echo -e "    ${MAGENTA}  | |_| |  __/| |___| |_| | |___   ${RESET}"
+    echo -e "    ${RED}   \\____|_|   |_____|____/|_____|  ${RESET}"
+    echo -e "    ${CYAN}${ICON_TELEGRAM} Подписывайтесь на Telegram: https://t.me/CryptalikBTC${RESET}"
+    echo -e "    ${CYAN}📺 Подписывайтесь на YouTube: https://www.youtube.com/@Cryptalik${RESET}"
 }
 
-# Function to install Docker and Docker Compose
-install_docker() {
-    echo -e "${GREEN}${ICON_INSTALL} Устанавливаем Docker и Docker Compose...${RESET}"
+# Установка необходимых компонентов
+install_dependencies() {
+    echo -e "${GREEN}${ICON_INSTALL} Установка необходимых компонентов...${RESET}"
     sudo apt update && sudo apt upgrade -y
+    sudo apt install -y git curl docker.io docker-compose bash-coreutils
+    echo -e "${GREEN}✅ Все необходимые компоненты установлены.${RESET}"
+    read -p "Нажмите Enter для продолжения..."
+}
 
-    # Устанавливаем необходимые зависимости
-    sudo apt install -y apt-transport-https ca-certificates curl software-properties-common lsb-release
-
-    # Устанавливаем Docker
-    if ! command -v docker &> /dev/null; then
-        curl -fsSL https://get.docker.com -o get-docker.sh
-        sudo sh get-docker.sh
-        sudo systemctl enable docker
-        sudo systemctl start docker
-    fi
-
-    # Устанавливаем Docker Compose
-    if ! command -v docker-compose &> /dev/null; then
-        sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" \
-        -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
-    fi
-
-    # Устанавливаем ограничение на размер логов Docker
-    echo -e "${YELLOW}Настроим ограничения на размер логов Docker...${RESET}"
+# Настройка Docker-логов
+configure_docker_logs() {
+    echo -e "${YELLOW}Настройка ограничения логов Docker...${RESET}"
     sudo mkdir -p /etc/docker
     echo '{
-      "log-driver": "json-file",
-      "log-opts": {
-        "max-size": "10m",
-        "max-file": "3"
-      }
-    }' | sudo tee /etc/docker/daemon.json
-
-    # Перезапуск Docker, чтобы изменения вступили в силу
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}' | sudo tee /etc/docker/daemon.json
     sudo systemctl restart docker
-
-    echo -e "${GREEN}Docker и Docker Compose успешно установлены и настроены с ограничением на логи.${RESET}"
+    echo -e "${GREEN}✅ Логи Docker ограничены до 10МБ.${RESET}"
 }
 
-# Function to clone the repo and set up the environment
-setup_browser() {
-    echo -e "${YELLOW}Клонируем репозиторий с GitHub...${RESET}"
-    git clone https://github.com/TaniaVAS/docker-browser.git
-    cd docker-browser
+# Основная установка браузера
+install_browser() {
+    echo -e "${YELLOW}Настройка среды...${RESET}"
+    read -p "Введите имя пользователя: " USERNAME
+    read -p "Введите пароль: " PASSWORD
+    read -p "Введите директорию HOME (по умолчанию текущая): " HOME_DIR
+    HOME_DIR=${HOME_DIR:-$(pwd)}
+    read -p "Введите порт (по умолчанию 10000): " PORT
+    PORT=${PORT:-10000}
 
-    echo -e "${YELLOW}Настроим права для скрипта chromeGRASS.sh${RESET}"
-    chmod ugo+x chromeGRASS.sh
+    # Создаём .env файл
+    echo "USERNAME=${USERNAME}" > .env
+    echo "PASSWORD=${PASSWORD}" >> .env
+    echo "HOME=${HOME_DIR}" >> .env
+    echo "PORT=${PORT}" >> .env
 
-    echo -e "${GREEN}Готово. Скрипт настроен.${RESET}"
+    echo -e "${GREEN}Запуск Docker Compose для установки браузера...${RESET}"
+    docker-compose up -d
+    echo -e "${GREEN}✅ Браузер успешно установлен и запущен на порту ${PORT}.${RESET}"
+    read -p "Нажмите Enter для продолжения..."
 }
 
-# Function to get the server IP address
-get_ip() {
-    IP=$(hostname -I | awk '{print $1}')
-    echo $IP
+# Перезапуск браузера
+restart_browser() {
+    echo -e "${YELLOW}Перезапуск браузера...${RESET}"
+    docker-compose restart
+    echo -e "${GREEN}✅ Браузер перезапущен.${RESET}"
+    read -p "Нажмите Enter для продолжения..."
 }
 
-# Function to open the browser
-open_browser() {
-    SERVER_IP=$(get_ip)
-    PORT=10000  # или запросить порт от пользователя
-    echo -e "${CYAN}Переходим в браузер по адресу http://${SERVER_IP}:${PORT}${RESET}"
-    xdg-open "http://${SERVER_IP}:${PORT}" || open "http://${SERVER_IP}:${PORT}"
+# Остановка браузера
+stop_browser() {
+    echo -e "${YELLOW}Остановка браузера...${RESET}"
+    docker-compose down
+    echo -e "${GREEN}✅ Браузер остановлен.${RESET}"
+    read -p "Нажмите Enter для продолжения..."
 }
 
-# Main menu
+# Переход в браузер
+browse_browser() {
+    SERVER_IP=$(hostname -I | awk '{print $1}')
+    if [ -z "$SERVER_IP" ]; then
+        echo -e "${RED}Не удалось определить IP-адрес сервера.${RESET}"
+    else
+        echo -e "${GREEN}Перейдите в браузер по адресу: http://$SERVER_IP:$PORT${RESET}"
+    fi
+    read -p "Нажмите Enter для возврата в меню..."
+}
+
+# Главное меню
 while true; do
     clear
     display_ascii
     echo -e "${CYAN}1.${RESET} ${ICON_INSTALL} Установить браузер"
-    echo -e "${CYAN}2.${RESET} ${ICON_STOP} Остановить браузер"
-    echo -e "${CYAN}3.${RESET} ${ICON_RES} Перезапустить браузер"
+    echo -e "${CYAN}2.${RESET} ${ICON_RES} Перезапустить браузер"
+    echo -e "${CYAN}3.${RESET} ${ICON_STOP} Остановить браузер"
     echo -e "${CYAN}4.${RESET} ${ICON_BROWSE} Перейти в браузер"
     echo -e "${CYAN}5.${RESET} ${ICON_EXIT} Выйти"
-    echo -ne "${YELLOW}Выберите опцию [1-5]:${RESET} "
+    echo -ne "${YELLOW}Выберите пункт [1-5]: ${RESET}"
     read choice
 
     case $choice in
         1)
-            install_docker
-            setup_browser
+            install_dependencies
+            configure_docker_logs
+            install_browser
             ;;
-
         2)
-            echo -e "${YELLOW}Останавливаем браузер...${RESET}"
-            docker-compose down
-            echo -e "${GREEN}✅ Браузер остановлен.${RESET}"
-            read -p "Нажмите Enter для продолжения..."
+            restart_browser
             ;;
-
         3)
-            echo -e "${YELLOW}Перезапускаем браузер...${RESET}"
-            docker-compose restart
-            echo -e "${GREEN}✅ Браузер перезапущен.${RESET}"
-            read -p "Нажмите Enter для продолжения..."
+            stop_browser
             ;;
-
         4)
-            open_browser
-            read -p "Нажмите Enter для продолжения..."
+            browse_browser
             ;;
-
         5)
             echo -e "${RED}Выход...${RESET}"
             exit 0
             ;;
-
         *)
             echo -e "${RED}Неверный ввод. Попробуйте снова.${RESET}"
             read -p "Нажмите Enter для продолжения..."
