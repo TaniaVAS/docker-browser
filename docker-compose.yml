@@ -5,7 +5,7 @@ services:
     container_name: BrowserGRASS
     privileged: true
     environment:
-      - TITLE=DKnodes
+      - TITLE=BrowserGRASS
       - DISPLAY=:1
       - PUID=1000
       - PGID=1000
